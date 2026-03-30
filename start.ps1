@@ -1,3 +1,4 @@
+
 #!/usr/bin/env pwsh
 
 # Script para iniciar desenvolvimento completo do projeto
