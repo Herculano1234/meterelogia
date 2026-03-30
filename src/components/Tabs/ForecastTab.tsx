@@ -27,12 +27,12 @@ export function ForecastTab({ alerts, loadingAlerts, onReload }: ForecastTabProp
             style={{
               margin: 0,
               fontSize: 16,
-              color: "#1976D2",
+              color: "#2563eb",
               letterSpacing: 2,
               textTransform: "uppercase",
             }}
           >
-            🌍 Previsão de Catástrofes Globais
+            🇦🇴 Previsão de Alertas - Angola
           </h2>
           <p
             style={{
@@ -41,7 +41,7 @@ export function ForecastTab({ alerts, loadingAlerts, onReload }: ForecastTabProp
               color: "#5B7C99",
             }}
           >
-            Dados em tempo real via Open-Meteo · Análise de CAPE, WMO Weather Codes, temperatura extrema
+            Análise em tempo real · 16 localidades de Angola · CAPE, WMO Weather Codes
           </p>
         </div>
         <button
@@ -49,10 +49,10 @@ export function ForecastTab({ alerts, loadingAlerts, onReload }: ForecastTabProp
           disabled={loadingAlerts}
           style={{
             padding: "8px 16px",
-            background: "rgba(33,150,243,0.08)",
-            border: "1px solid #2196F3",
+            background: "rgba(37, 99, 235, 0.1)",
+            border: "1px solid rgba(37, 99, 235, 0.3)",
             borderRadius: 8,
-            color: "#1976D2",
+            color: "#2563eb",
             fontFamily: "inherit",
             fontSize: 12,
             cursor: "pointer",
@@ -86,7 +86,7 @@ export function ForecastTab({ alerts, loadingAlerts, onReload }: ForecastTabProp
                   background: s.color,
                 }}
               />
-              <span style={{ color: "#0288D1" }}>{s.label}</span>
+              <span style={{ color: "#2563eb" }}>{s.label}</span>
             </div>
           ))}
           <span style={{ fontSize: 11, color: "#5B7C99", marginLeft: "auto" }}>
@@ -119,8 +119,8 @@ export function ForecastTab({ alerts, loadingAlerts, onReload }: ForecastTabProp
       <div
         style={{
           marginTop: 24,
-          background: "rgba(33,150,243,0.06)",
-          border: "1px solid rgba(33,150,243,0.15)",
+          background: "rgba(37, 99, 235, 0.06)",
+          border: "1px solid rgba(37, 99, 235, 0.15)",
           borderRadius: 12,
           padding: 16,
         }}
@@ -129,7 +129,7 @@ export function ForecastTab({ alerts, loadingAlerts, onReload }: ForecastTabProp
           style={{
             margin: "0 0 8px",
             fontSize: 12,
-            color: "#1976D2",
+            color: "#2563eb",
             textTransform: "uppercase",
             letterSpacing: 2,
           }}
@@ -137,10 +137,9 @@ export function ForecastTab({ alerts, loadingAlerts, onReload }: ForecastTabProp
           ℹ️ Sobre os Indicadores
         </h4>
         <p style={{ margin: 0, fontSize: 12, color: "#5B7C99", lineHeight: 1.7 }}>
-          <b style={{ color: "#0288D1" }}>CAPE (Convective Available Potential Energy)</b>: Energia disponível para
+          <b style={{ color: "#2563eb" }}>CAPE (Convective Available Potential Energy)</b>: Energia disponível para
           convecção. Valores acima de 1500 J/kg indicam risco alto de trovoadas. Os dados são obtidos em tempo real
-          via <b style={{ color: "#1976D2" }}>Open-Meteo API</b> (gratuita, sem chave API) usando modelos NOAA GFS,
-          DWD ICON e ECMWF IFS. Atualização automática a cada hora.
+          via <b style={{ color: "#2563eb" }}>Open-Meteo API</b> (gratuita, sem chave API) analisando 16 localidades principais de Angola. Atualização automática a cada hora.
         </p>
       </div>
     </div>

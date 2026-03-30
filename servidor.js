@@ -1,29 +1,24 @@
-/**
- * ARQUIVO DE REFERÊNCIA PARA SERVIDOR BACKEND
- * 
- * Este arquivo demonstra como implementar o endpoint /alerta em um servidor Node.js + Express
- * Salve este código em: backend/server.js ou servidor.js na sua aplicação
- * 
- * Instalação:
- * npm install express cors
- * 
- * Execução:
- * node servidor.js
- */
-
-// ============================================
-// OPÇÃO 1: Express + Node.js (Recomendado)
-// ============================================
-
 import express from "express";
 import cors from "cors";
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 app.use(express.json());
+
+// Middleware para remover trailing slash
+app.use((req, res, next) => {
+  if (req.path !== "/" && req.path.endsWith("/")) {
+    return res.redirect(301, req.path.slice(0, -1));
+  }
+  next();
+});
 
 /**
  * Estado global de alerta do sistema
@@ -58,7 +53,9 @@ app.get("/alerta", (req, res) => {
   const alertAge = Date.now() - currentAlert.timestamp;
   const isAlertActive = alertAge < currentAlert.duration;
 
-  res.json({
+  console.log(`[GET /alerta] Consulta recebida - Alerta ativo: ${isAlertActive}, Level: ${currentAlert.level}`);
+
+  res.status(200).json({
     success: true,
     data: {
       level: isAlertActive ? currentAlert.level : 0, // Retorna 0 se expirou
@@ -89,6 +86,8 @@ app.get("/alerta", (req, res) => {
 app.post("/alerta", (req, res) => {
   const { level, weathercode, cape, temperature, location, duration = 180000 } = req.body;
 
+  console.log(`[POST /alerta] Novo alerta recebido:`, { level, location, duration });
+
   // Validação
   if (![0, 1, 2].includes(level)) {
     return res.status(400).json({
@@ -115,9 +114,9 @@ app.post("/alerta", (req, res) => {
     duration: Math.max(1000, Math.min(600000, duration)), // Min 1s, max 10 min
   };
 
-  console.log(`[SERVIDOR] Novo alerta: Nível ${level} em ${location}`);
+  console.log(`[SERVIDOR] ✅ Novo alerta: Nível ${level} em ${location}`);
 
-  res.json({
+  res.status(200).json({
     success: true,
     message: "Alerta definido com sucesso",
     data: currentAlert,
@@ -139,9 +138,9 @@ app.delete("/alerta", (req, res) => {
     duration: 0,
   };
 
-  console.log("[SERVIDOR] Alerta cancelado");
+  console.log("[SERVIDOR] ❌ Alerta cancelado");
 
-  res.json({
+  res.status(200).json({
     success: true,
     message: "Alerta cancelado",
   });
@@ -152,7 +151,7 @@ app.delete("/alerta", (req, res) => {
  * Retorna informações de status do sistema
  */
 app.get("/alerta/status", (req, res) => {
-  res.json({
+  res.status(200).json({
     success: true,
     system: {
       serverTime: Date.now(),
@@ -170,60 +169,56 @@ app.get("/alerta/status", (req, res) => {
  * Health check endpoint
  */
 app.get("/health", (req, res) => {
-  res.json({
+  res.status(200).json({
     status: "online",
     service: "Lightning Alert System",
     timestamp: Date.now(),
   });
 });
 
-// Inicia servidor
-app.listen(PORT, () => {
-  console.log(`✅ Servidor de Alertas rodando em http://localhost:${PORT}`);
-  console.log(`📡 Endpoint GET  /alerta         → Consultado pelo ESP32 (a cada 500ms)`);
-  console.log(`📡 Endpoint POST /alerta         → Define novo alerta`);
-  console.log(`📡 Endpoint DELETE /alerta       → Cancela alerta`);
-  console.log(`📡 Endpoint GET  /alerta/status  → Status do sistema`);
-  console.log(`📡 Endpoint GET  /health         → Health check`);
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error("[ERRO]", err.message);
+  res.status(500).json({
+    success: false,
+    error: err.message,
+  });
 });
 
-// ============================================
-// EXEMPLO DE USO CURL
-// ============================================
-/*
-# Verificar estado de alerta (o que ESP32 vai fazer a cada 500ms)
-curl http://localhost:3001/alerta
+// Inicia servidor
+const server = app.listen(PORT, "0.0.0.0", () => {
+  console.log(`
+╔════════════════════════════════════════════════════════╗
+║  ⚡ SERVIDOR DE ALERTAS DE RAIOS - RODANDO              ║
+╚════════════════════════════════════════════════════════╝
+  
+  🌐 Endereço:    http://0.0.0.0:${PORT}
+  📡 Porta:       ${PORT}
+  
+  ENDPOINTS:
+  ✅ GET    /alerta          → Consultado pelo ESP32 (a cada 500ms)
+  ✅ POST   /alerta          → Define novo alerta
+  ✅ DELETE /alerta          → Cancela alerta
+  ✅ GET    /alerta/status   → Status do sistema
+  ✅ GET    /health          → Health check
+  
+  EXEMPLO DE USO:
+  curl http://localhost:${PORT}/alerta
+  
+  PARA ENVIAR ALERTA:
+  curl -X POST http://localhost:${PORT}/alerta \\
+    -H "Content-Type: application/json" \\
+    -d '{"level": 2, "location": "Luanda", "duration": 180000}'
+  
+═══════════════════════════════════════════════════════════
+  `);
+});
 
-# Criar um novo alerta de chuva
-curl -X POST http://localhost:3001/alerta \
-  -H "Content-Type: application/json" \
-  -d '{
-    "level": 1,
-    "weathercode": 61,
-    "cape": 800,
-    "temperature": 22,
-    "location": "Luanda",
-    "duration": 180000
-  }'
-
-# Criar um alerta de trovoada
-curl -X POST http://localhost:3001/alerta \
-  -H "Content-Type: application/json" \
-  -d '{
-    "level": 2,
-    "weathercode": 95,
-    "cape": 2500,
-    "temperature": 20,
-    "location": "Luanda",
-    "duration": 300000
-  }'
-
-# Cancelar alerta
-curl -X DELETE http://localhost:3001/alerta
-
-# Ver status do sistema
-curl http://localhost:3001/alerta/status
-
-# Health check
-curl http://localhost:3001/health
-*/
+// Graceful shutdown
+process.on("SIGINT", () => {
+  console.log("\n⛔ Encerrando servidor...");
+  server.close(() => {
+    console.log("✅ Servidor encerrado");
+    process.exit(0);
+  });
+});

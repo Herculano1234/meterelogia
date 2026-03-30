@@ -12,102 +12,59 @@ interface RiskGaugeProps {
   onAlert: () => void;
   isLoading: boolean;
 }
-
-export function RiskGauge({
-  icon,
-  location,
-  province,
-  level,
-  color,
-  score,
-  weatherLabel,
-  cape,
-  onAlert,
-  isLoading,
-}: RiskGaugeProps) {
+export function RiskGauge({ icon, location, province, level, color, score, weatherLabel, cape, onAlert, isLoading }: RiskGaugeProps) {
   return (
-    <div
-      style={{
-        background: `linear-gradient(135deg, ${color}18, rgba(240,247,255,0.8))`,
-        border: `2px solid ${color}`,
-        borderRadius: 16,
-        padding: "20px 24px",
-        marginBottom: 20,
-        boxShadow: `0 4px 20px ${color}25`,
-        display: "flex",
-        alignItems: "center",
-        gap: 20,
-        flexWrap: "wrap",
-      }}
-    >
-      <div style={{ fontSize: 48 }}>{icon}</div>
-      <div style={{ flex: 1 }}>
-        <div
-          style={{
-            fontSize: 11,
-            color: "#1976D2",
-            letterSpacing: 3,
-            textTransform: "uppercase",
-            marginBottom: 4,
-          }}
-        >
-          Risco de Relâmpago · {location}, {province}
+    <div style={{
+      background: `linear-gradient(135deg, ${color} 0%, #1e293b 100%)`,
+      borderRadius: "40px",
+      padding: "32px",
+      color: "white",
+      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+      position: "relative",
+      overflow: "hidden",
+      marginBottom: "30px"
+    }}>
+      {/* Círculo de brilho decorativo no fundo do card */}
+      <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "150px", height: "150px", background: "rgba(255,255,255,0.1)", borderRadius: "50%", filter: "blur(40px)" }} />
+      
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div>
+            <h2 style={{ fontSize: "32px", margin: 0, fontWeight: 800 }}>{location}</h2>
+            <p style={{ opacity: 0.8, fontSize: "14px", letterSpacing: 1 }}>{province.toUpperCase()}</p>
+          </div>
+          <div style={{ fontSize: "64px" }}>{icon}</div>
         </div>
-        <div style={{ fontSize: "clamp(24px,5vw,36px)", fontWeight: 700, color, letterSpacing: 2 }}>
-          {level}
+
+        <div style={{ marginTop: "24px" }}>
+          <div style={{ fontSize: "48px", fontWeight: 900, lineHeight: 1 }}>{level}</div>
+          <p style={{ margin: "8px 0", opacity: 0.9 }}>{weatherLabel} • CAPE: {Math.round(cape)}</p>
         </div>
-        <div style={{ fontSize: 13, color: "#0288D1", marginTop: 2 }}>
-          {weatherLabel} · CAPE: {Math.round(cape)} J/kg
+
+        {/* Barra de Progresso Estilizada */}
+        <div style={{ marginTop: "20px" }}>
+          <div style={{ height: 12, background: "rgba(0,0,0,0.2)", borderRadius: 10, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div style={{ height: "100%", width: `${score}%`, background: "#fff", borderRadius: 10, transition: "1s ease" }} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginTop: 8, fontWeight: 600 }}>
+            <span>SEGURO</span>
+            <span>CRÍTICO</span>
+          </div>
         </div>
-      </div>
-      <div style={{ width: "100%", marginTop: 8 }}>
-        <div style={{ height: 6, background: "rgba(100,150,200,0.15)", borderRadius: 4, overflow: "hidden" }}>
-          <div
+
+        {score >= 45 && (
+          <button 
+            onClick={onAlert}
             style={{
-              height: "100%",
-              width: `${score}%`,
-              background: `linear-gradient(90deg, #4CAF50, ${color})`,
-              borderRadius: 4,
-              transition: "width 1s ease",
+              marginTop: "24px", width: "100%", padding: "14px", borderRadius: "16px",
+              border: "none", background: "white", color: "#000", fontWeight: "bold",
+              cursor: "pointer", boxShadow: "0 10px 20px rgba(0,0,0,0.2)"
             }}
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontSize: 10,
-            color: "#1976D2",
-            marginTop: 4,
-          }}
-        >
-          <span>Mínimo</span>
-          <span>Baixo</span>
-          <span>Moderado</span>
-          <span>Alto</span>
-          <span>Extremo</span>
-        </div>
+          >
+            {isLoading ? "ENVIANDO SINAL..." : "DISPARAR ALERTA ESP32"}
+          </button>
+        )}
       </div>
-      {score >= 45 && (
-        <button
-          onClick={onAlert}
-          disabled={isLoading}
-          style={{
-            padding: "10px 18px",
-            background: `${color}22`,
-            border: `1px solid ${color}`,
-            borderRadius: 8,
-            color,
-            fontFamily: "inherit",
-            fontSize: 12,
-            cursor: "pointer",
-            letterSpacing: 1,
-            whiteSpace: "nowrap",
-          }}
-        >
-          {isLoading ? "⏳ Enviando..." : "📡 Alertar ESP32"}
-        </button>
-      )}
     </div>
   );
 }

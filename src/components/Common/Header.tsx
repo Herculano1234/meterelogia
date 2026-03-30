@@ -1,91 +1,68 @@
+import { useTheme } from "../../context/ThemeContext";
 import { ESP32Status } from "../../types";
-import { TabButton } from "../Common/TabButton";
 
 interface HeaderProps {
   activeTab: string;
   onTabChange: (tab: "realtime" | "forecast" | "esp32") => void;
   esp32: ESP32Status;
 }
-
 export function Header({ activeTab, onTabChange, esp32 }: HeaderProps) {
+  const { theme } = useTheme();
+  
   return (
     <header
       style={{
-        marginBottom: 28,
-        borderBottom: "1px solid rgba(100,150,200,0.3)",
-        paddingBottom: 20,
+        background: "rgba(255, 255, 255, 0.4)",
+        backdropFilter: "blur(20px)",
+        borderBottom: `1px solid ${theme.border}`,
+        padding: "20px 24px",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        transition: "all 0.3s ease",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 14,
-            background: "linear-gradient(135deg, #FFB74D, #81C784)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 28,
-            boxShadow: "0 4px 15px rgba(255,183,77,0.3)",
-          }}
-        >
-          ☁️
-        </div>
-        <div>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: "clamp(18px,4vw,26px)",
-              fontWeight: 700,
-              letterSpacing: 2,
-              color: "#2196F3",
-              textTransform: "uppercase",
-            }}
-          >
-            Sistema de Monitoramento
-          </h1>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 12,
-              color: "#1976D2",
-              letterSpacing: 3,
-              textTransform: "uppercase",
-            }}
-          >
-            Descargas Atmosféricas · Angola · Open-Meteo API
-          </p>
-        </div>
-        <div style={{ marginLeft: "auto", textAlign: "right" }}>
-          <div style={{ fontSize: 11, color: "#1976D2" }}>⏱ {new Date().toLocaleString("pt-AO")}</div>
-          <div
-            style={{
-              fontSize: 11,
-              color: esp32.connected ? "#2E7D32" : "#C62828",
-              marginTop: 2,
-            }}
-          >
-            ● ESP32: {esp32.connected ? `ONLINE @ ${esp32.ip}` : "OFFLINE"}
+      <div style={{ maxWidth: "1400px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{
+            width: 50, height: 50, borderRadius: "18px",
+            background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+            boxShadow: "0 10px 20px rgba(37, 99, 235, 0.2)"
+          }}>⚡</div>
+          <div>
+            <h1 style={{ margin: 0, fontSize: "clamp(18px, 4vw, 24px)", fontWeight: 800, color: theme.textPrimary }}>Monitor Pro</h1>
+            <p style={{ margin: 0, fontSize: "clamp(10px, 1.5vw, 12px)", color: theme.textSecondary }}>Angola • Tempo Real</p>
           </div>
         </div>
-      </div>
 
-      {/* TABS */}
-      <div style={{ display: "flex", gap: 6, marginTop: 20, flexWrap: "wrap" }}>
-        {[
-          { id: "realtime" as const, label: "⚡ Tempo Real", icon: "📡" },
-          { id: "forecast" as const, label: "🌍 Previsão Global", icon: "🛰️" },
-          { id: "esp32" as const, label: "📡 ESP32 Control", icon: "🔌" },
-        ].map((tab) => (
-          <TabButton
-            key={tab.id}
-            id={tab.id}
-            label={tab.label}
-            isActive={activeTab === tab.id}
-            onClick={() => onTabChange(tab.id)}
-          />
-        ))}
+        {/* TABS ESTILO PÍLULA */}
+        <div style={{ background: "rgba(0,0,0,0.08)", padding: 4, borderRadius: 20, display: "flex", gap: 4 }}>
+          {["realtime", "forecast"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => onTabChange(tab as any)}
+              style={{
+                padding: "8px 20px", borderRadius: 16, border: "none", cursor: "pointer",
+                background: activeTab === tab ? "rgba(37, 99, 235, 0.2)" : "transparent",
+                color: activeTab === tab ? theme.textPrimary : theme.textSecondary,
+                fontWeight: 600, transition: "0.3s", fontSize: "clamp(11px, 2vw, 14px)"
+              }}
+            >
+              {tab === "realtime" ? "Live" : "Previsão"}
+            </button>
+          ))}
+        </div>
+
+        {/* STATUS ESP32 */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(37, 99, 235, 0.1)", padding: "8px 16px", borderRadius: 12 }}>
+          <div style={{ 
+            width: 8, height: 8, borderRadius: "50%", 
+            background: esp32.connected ? "#10b981" : "#ef4444",
+            boxShadow: esp32.connected ? "0 0 10px #10b981" : "none" 
+          }} />
+          <span style={{ fontSize: "clamp(10px, 1.5vw, 12px)", fontWeight: "bold", color: theme.textPrimary }}>{esp32.connected ? "ESP32 ON" : "OFFLINE"}</span>
+        </div>
       </div>
     </header>
   );
