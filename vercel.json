@@ -1,5 +1,27 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite"
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/alerts",
+      "destination": "/api/alerts.js"
+    },
+    {
+      "source": "/api/esp32/alert",
+      "destination": "/api/esp32-alert.js"
+    },
+    {
+      "source": "/api/esp32/devices",
+      "destination": "/api/esp32-devices.js"
+    },
+    {
+      "source": "/api/esp32/email-alerts",
+      "destination": "/api/esp32-email-alerts.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
